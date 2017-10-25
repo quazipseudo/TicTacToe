@@ -1,0 +1,57 @@
+import bge
+import tttboardMulti
+import tttturn_count
+
+globalDict = bge.logic.globalDict               # import globalDict
+board = tttboardMulti.BOARD                     # import board
+turn_count = tttturn_count.TURN_COUNT           # import turn counter
+
+def run():                                      # main function
+    
+    cont = bge.logic.getCurrentController()     # Gets player input
+    own = cont.owner                            # Defines who "has" the controller
+    scene = cont.owner.scene                    # Defines the current scene so inactive objects can be accessed ---- ???
+    player = cont.owner.get('player', 0)        # Replayers value of game property 'player', or zero if it doesn't exist
+    target = None                               # Determines where to put the piece.
+    key = bge.logic.keyboard.events             # Determines which key is pressed.
+    pressed = bge.logic.KX_INPUT_JUST_ACTIVATED # Determines WHEN a key is pressed.
+                                                # current_board = board
+ 
+    if player == 0:                             # choose piece for current player / player
+        shape = scene.objectsInactive['Cube']   # choose cube
+    else:                                       # or
+        shape = scene.objectsInactive['Ball']   # choose ball
+    
+    # DETERMINE WHAT KEY IS ACTIVATED, MAKE/CALL CORESPONDING VARIABLES, DETERMINE IF TARGET IS AVAILABLE
+    if key[bge.events.PAD1] == pressed and board[0][2][0] == None:  # determine key event and BOARD spot availability
+        target = scene.objects['Empty1']                            # determine 3D placement position
+        board[0][2][0] = shape                                      # assign value to BOARD spot
+        turn_count[0][0][0] = turn_count[0][0][0] + 1               # add 1 to the turn count 
+        print("Numpad1", target, "Turn", turn_count[0][0], "Player", player, board[0][2][0], board, globalDict) 
+        
+    if key[bge.events.PAD2] == pressed and board[0][2][1] == None:
+        target = scene.objects['Empty2']
+        board[0][2][1] = shape                            
+        turn_count[0][0][0] = turn_count[0][0][0] + 1   
+        print("Numpad2", target, "Turn", turn_count[0][0], "Player", player, board[0][2][1], board, globalDict)   
+                  
+    if key[bge.events.PAD3] == pressed and board[0][2][2] == None:
+        target = scene.objects['Empty3']
+        board[0][2][2] = shape                           
+        turn_count[0][0][0] = turn_count[0][0][0] + 1
+        print("Numpad3", target, "Turn", turn_count[0][0], "Player", player, board[0][2][2], board, globalDict) 
+
+
+    if target is not None:                               # If a key is activated
+        new_piece = scene.addObject(shape)               # Create the piece
+        new_piece.worldPosition = target.worldPosition   # Put new piece at target / empty.
+        player = 1 - player                              # Switch the number in player from 0 to 1 or 1 to 0
+        own['player'] = player                           # Store the value of game property 'player'
+        
+        
+    if key[bge.events.PAD0]:                             # determine when zero key is pressed
+        print("Numpad 0 = delete last item")             # visual test to see if the IF statement works
+        new_piece.endObject()                            # want it to errase the last object  
+          
+run()
+
